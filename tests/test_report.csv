@@ -1,0 +1,9 @@
+# Rapport Récapitulatif des Stocks
+Nombre total de produits : 4
+Quantité totale : 165
+Valeur totale des stocks : 53298.65 €
+
+# Statistiques par catégorie
+Categorie,Quantite_totale,Valeur_totale
+Electronique,65,42499.35
+Maison,100,10799.3
