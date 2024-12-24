@@ -51,3 +51,36 @@ class InventoryManager:
         Retourne les données consolidées.
         """
         return self.data
+    
+    def search_by_name(self, name):
+        """
+        Recherche des produits par nom.
+        :param name: Nom partiel ou complet du produit.
+        :return: DataFrame des résultats.
+        """
+        return self.data[self.data['Nom du produit'].astype(str).str.contains(name, case=False, na=False)]
+
+    def search_by_category(self, category):
+        """
+        Recherche des produits par catégorie.
+        :param category: Nom de la catégorie.
+        :return: DataFrame des résultats.
+        """
+        return self.data[self.data['Categorie'].astype(str).str.contains(category, case=False, na=False)]
+
+    def search_by_price_range(self, min_price, max_price):
+        """
+        Recherche des produits dans une plage de prix.
+        :param min_price: Prix minimum (float).
+        :param max_price: Prix maximum (float).
+        :return: DataFrame des résultats.
+        """
+        # Assurez-vous que la colonne Prix est numérique
+        self.data['Prix'] = pd.to_numeric(self.data['Prix'], errors='coerce').fillna(0)
+
+        try:
+            min_price = float(min_price)
+            max_price = float(max_price)
+            return self.data[(self.data['Prix'] >= min_price) & (self.data['Prix'] <= max_price)]
+        except ValueError:
+            raise ValueError("Les prix minimum et maximum doivent être des nombres valides.")
