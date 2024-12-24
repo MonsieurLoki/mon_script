@@ -31,3 +31,43 @@ Produit un fichier CSV récapitulatif contenant :
 - La quantité totale de produits en stock.
 - La valeur totale des stocks.
 - Les statistiques regroupées par catégorie.
+
+### Exemple d'utilisation
+
+#### Format attendu pour les fichiers CSV
+Les fichiers doivent respecter une structure cohérente. Voici un exemple :
+
+```csv
+Id;Nom du produit;Quantite;Prix;Categorie
+1;Smartphone;50;699.99;Electronique
+2;Table;30;150.00;Maison
+3;Chaise;70;89.99;Maison
+4;TV;15;499.99;Electronique
+```
+
+#### Lancement du programme
+1. Exécutez le fichier principal :
+
+```bash
+python main.py
+```
+2. Suivez les instructions dans le menu interactif pour :
+
+- Charger des fichiers CSV.
+- Rechercher des produits.
+- Générer un rapport.
+
+### Rapport généré
+Le rapport est sauvegardé sous forme de fichier CSV. Voici un aperçu des informations contenues :
+
+```yaml
+#Rapport de Gestion d'Inventaire
+Nombre total de produits : 4
+Quantité totale : 165
+Valeur totale des stocks : 46 148.50 €
+#Statistiques par catégorie
+
+Categorie,Quantite_totale,Valeur_totale
+Electronique,65,45198.50
+Maison,100,950.00
+```
