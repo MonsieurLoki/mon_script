@@ -84,3 +84,40 @@ class InventoryManager:
             return self.data[(self.data['Prix'] >= min_price) & (self.data['Prix'] <= max_price)]
         except ValueError:
             raise ValueError("Les prix minimum et maximum doivent être des nombres valides.")
+        
+    def generate_report(self, output_file="rapport_recapitulatif.csv"):
+        """
+        Génère un rapport récapitulatif exportable.
+        :param output_file: Nom du fichier CSV pour l'export.
+        """
+        if self.data.empty:
+            raise ValueError("Aucune donnée chargée pour générer un rapport.")
+
+        # Convertir les colonnes 'Quantité' et 'Prix' en numérique
+        self.data['Quantite'] = pd.to_numeric(self.data['Quantite'], errors='coerce').fillna(0)
+        self.data['Prix'] = pd.to_numeric(self.data['Prix'], errors='coerce').fillna(0)
+
+        # Ajouter une colonne pour la valeur totale par produit
+        self.data['Valeur_totale_produit'] = self.data['Quantite'] * self.data['Prix']
+
+        # Statistiques globales
+        total_products = len(self.data)
+        total_quantity = self.data['Quantite'].sum()
+        total_value = self.data['Valeur_totale_produit'].sum()
+
+        # Statistiques par catégorie
+        category_stats = self.data.groupby("Categorie").agg(
+            Quantite_totale=("Quantite", "sum"),
+            Valeur_totale=("Valeur_totale_produit", "sum")
+        ).reset_index()
+
+        # Exporter dans un fichier CSV
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write("# Rapport Récapitulatif des Stocks\n")
+            f.write(f"Nombre total de produits : {total_products}\n")
+            f.write(f"Quantité totale : {total_quantity}\n")
+            f.write(f"Valeur totale des stocks : {total_value:.2f} €\n\n")
+            f.write("# Statistiques par catégorie\n")
+            category_stats.to_csv(f, index=False)
+
+        print(f"Le rapport a été exporté dans le fichier '{output_file}'.")
