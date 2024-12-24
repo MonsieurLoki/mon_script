@@ -71,3 +71,43 @@ Categorie,Quantite_totale,Valeur_totale
 Electronique,65,45198.50
 Maison,100,950.00
 ```
+
+### Installation
+#### Prérequis
+Avoir Python 3.x installé sur votre système.
+Installer la bibliothèque pandas :
+
+```bash
+pip install pandas
+```
+
+#### Configuration
+1. Clonez ce dépôt ou téléchargez les fichiers nécessaires.
+2. Placez vos fichiers CSV dans un dossier nommé data à la racine du projet.
+3. Créez un dossier outputs pour les fichiers consolidés et les rapports générés :
+
+```bash
+mkdir data outputs
+```
+
+### Tester le système
+Des tests unitaires sont fournis pour vérifier le bon fonctionnement du programme. Pour les exécuter, utilisez la commande suivante :
+
+```bash
+python -m unittest discover tests
+```
+
+### Structure du projet
+Voici la structure du projet pour une meilleure compréhension :
+
+```bash
+.
+├── data/                     # Contient les fichiers CSV d'entrée
+├── outputs/                  # Contient les rapports générés et les fichiers consolidés
+├── src/
+│   inventory_manager.py  # Contient la classe principale de gestion d'inventaire
+│   main.py               # Point d'entrée du programme
+├── tests/
+│   ├── test_inventory_manager.py  # Tests unitaires
+├── README.md                 # Documentation principale
+```
