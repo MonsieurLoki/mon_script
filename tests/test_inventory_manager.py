@@ -1,76 +1,78 @@
+import unittest
+import pandas as pd
 from inventory_manager import InventoryManager
 
 
-def main():
-    print("Bienvenue dans le système de gestion d'inventaire !")
+class TestInventoryManager(unittest.TestCase):
 
-    # Initialiser l'InventoryManager
-    manager = InventoryManager()
+    def setUp(self):
+        """Configuration avant chaque test"""
+        self.manager = InventoryManager()
+        self.sample_data = pd.DataFrame({
+            "Id": [1, 2, 3, 4],
+            "Nom du produit": ["Smartphone", "Table", "Chaise", "TV"],
+            "Quantite": [50, 30, 70, 15],
+            "Prix": [699.99, 150.00, 89.99, 499.99],
+            "Categorie": ["Electronique", "Maison", "Maison", "Electronique"]
+        })
+        self.manager.data = self.sample_data
 
-    # Demander les fichiers CSV à l'utilisateur
-    file_input = input("Entrez les chemins des fichiers CSV à fusionner (séparés par des virgules) : ")
-    file_paths = [file.strip() for file in file_input.split(",")]
+    def test_load_csv_files(self):
+        """Test du chargement et de la fusion des fichiers CSV"""
+        # Simule des fichiers CSV chargés
+        df1 = pd.DataFrame({
+            "Id": [1, 2],
+            "Nom du produit": ["Laptop", "Smartphone"],
+            "Quantite": [10, 20],
+            "Prix": [999.99, 699.99],
+            "Categorie": ["Electronique", "Electronique"]
+        })
+        df2 = pd.DataFrame({
+            "Id": [3, 4],
+            "Nom du produit": ["Table", "Chaise"],
+            "Quantite": [15, 25],
+            "Prix": [150.00, 89.99],
+            "Categorie": ["Maison", "Maison"]
+        })
+        self.manager.data = pd.concat([df1, df2], ignore_index=True)
+        self.assertEqual(len(self.manager.data), 4)
 
-    try:
-        # Charger et fusionner les fichiers CSV
-        manager.load_csv_files(file_paths)
-        print("\nDonnées consolidées chargées avec succès.")
-    except Exception as e:
-        print(f"Erreur : {e}")
-        return
+    def test_search_by_name(self):
+        """Test de la recherche par nom du produit"""
+        results = self.manager.search_by_name("Smartphone")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results.iloc[0]["Nom du produit"], "Smartphone")
 
-    while True:
-        print("\nOptions disponibles :")
-        print("1. Rechercher par nom du produit")
-        print("2. Rechercher par catégorie")
-        print("3. Rechercher par plage de prix")
-        print("4. Afficher toutes les données")
-        print("5. Générer un rapport récapitulatif exportable")
-        print("6. Quitter")
+    def test_search_by_category(self):
+        """Test de la recherche par catégorie"""
+        results = self.manager.search_by_category("Maison")
+        self.assertEqual(len(results), 2)
+        self.assertIn("Table", results["Nom du produit"].values)
+        self.assertIn("Chaise", results["Nom du produit"].values)
 
-        choice = input("Choisissez une option : ")
+    def test_search_by_price_range(self):
+        """Test de la recherche dans une plage de prix"""
+        results = self.manager.search_by_price_range(100, 700)
+        self.assertIn("Table", results["Nom du produit"].values)
 
-        if choice == "1":
-            name = input("Entrez le nom (ou partie du nom) du produit à rechercher : ")
-            results = manager.search_by_name(name)
-            print("\nRésultats de la recherche par nom :")
-            print(results if not results.empty else "Aucun produit trouvé.")
+    def test_generate_report(self):
+        """Test de la génération de rapport"""
+        output_file = "test_report.csv"
+        self.manager.generate_report(output_file)
 
-        elif choice == "2":
-            category = input("Entrez la catégorie à rechercher : ")
-            results = manager.search_by_category(category)
-            print("\nRésultats de la recherche par catégorie :")
-            print(results if not results.empty else "Aucun produit trouvé.")
+        # Vérifie si le fichier a été créé
+        with open(output_file, "r", encoding="utf-8") as f:
+            content = f.read()
+        self.assertIn("Nombre total de produits", content)
+        self.assertIn("Quantite_totale", content)
+        self.assertIn("Valeur_totale", content)
 
-        elif choice == "3":
-            min_price = input("Entrez le prix minimum : ")
-            max_price = input("Entrez le prix maximum : ")
-            try:
-                results = manager.search_by_price_range(min_price, max_price)
-                print("\nRésultats de la recherche par plage de prix :")
-                print(results if not results.empty else "Aucun produit trouvé.")
-            except ValueError as e:
-                print(f"Erreur : {e}")
-
-        elif choice == "4":
-            print("\nDonnées consolidées :")
-            print(manager.get_data())
-
-        elif choice == "5":
-            output_file = input(
-                "Entrez le nom du fichier pour le rapport (par défaut : rapport_recapitulatif.csv) : ").strip()
-            output_file = output_file if output_file else "rapport_recapitulatif.csv"
-            try:
-                manager.generate_report(output_file)
-            except Exception as e:
-                print(f"Erreur : {e}")
-
-        elif choice == "6":
-            print("Merci d'avoir utilisé le système de gestion d'inventaire. À bientôt !")
-            break
-        else:
-            print("Option invalide, veuillez réessayer.")
+    def test_empty_data_handling(self):
+        """Test de gestion des données vides"""
+        self.manager.data = pd.DataFrame()  # Données vides
+        with self.assertRaises(ValueError):
+            self.manager.generate_report()
 
 
 if __name__ == "__main__":
-    main()
+    unittest.main()
